@@ -6,8 +6,8 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [SerializeField] private float speed;
-
     private Rigidbody2D rb;
+    public int damage = 100;
 
     private void Awake(){
         rb = GetComponent<Rigidbody2D>();
@@ -23,4 +23,13 @@ public class Bullet : MonoBehaviour
         yield return new WaitForSeconds(2.0f);
         this.gameObject.SetActive(false);
     }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy")) // Check if the collider is tagged as "Enemy"
+        {
+            this.gameObject.SetActive(false); // Deactivate the bullet
+        }
+    }
 }
+

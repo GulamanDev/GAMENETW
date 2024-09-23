@@ -4,11 +4,27 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    //AI Initial Health
+    [SerializeField] private float health;
+    //AI Max Health
+    [SerializeField] private float maxHealth;
+    //HelthBar
+    [SerializeField] EnemyHealth healthBar;
     [SerializeField] private float moveSpeed = 5.0f;
+   
+    public int damage = 10;
+    public int bulletDamage = 50;
+    public float Health => health;
+    public float MaxHealth => maxHealth;
 
     private Transform target = null;
+    private ScoreManager scoreManager;
 
     private void OnEnable(){
+        scoreManager = FindObjectOfType<ScoreManager>();
+        healthBar = GetComponentInChildren<EnemyHealth>();
+        health = maxHealth;
+        healthBar.UpdateHealthBar(health , maxHealth);
         LookAtTarget();
     }
 
@@ -31,5 +47,24 @@ public class Enemy : MonoBehaviour
 
     private void Move(){
         transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        Bullet bullet = other.gameObject.GetComponent<Bullet>();
+        if (other.CompareTag("Bullet"))
+        {
+            health -= bulletDamage;
+            healthBar.UpdateHealthBar(health , maxHealth);
+            if (health <= 0)
+            {
+            this.gameObject.SetActive(false);
+            scoreManager.EnemyDeactivated();
+            }
+        }
+        if (other.CompareTag("Planet"))
+        {
+            this.gameObject.SetActive(false);
+        }
     }
 }
